@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Appointment Setter &mdash; Campaign Command Center</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="topbar-left">
+    <div class="logo">
+      <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <span>AppointmentAI</span>
+    </div>
+    <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle navigation">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><rect y="3" width="20" height="2" rx="1"/><rect y="9" width="20" height="2" rx="1"/><rect y="15" width="20" height="2" rx="1"/></svg>
+    </button>
+    <nav class="topbar-nav">
+      <button class="nav-btn active" data-view="dashboard">Dashboard</button>
+      <button class="nav-btn" data-view="campaigns">Campaigns</button>
+      <button class="nav-btn" data-view="leads">Leads</button>
+      <button class="nav-btn" data-view="conversations">Conversations</button>
+      <button class="nav-btn" data-view="schedule">Schedule</button>
+    </nav>
+  </div>
+  <div class="topbar-right">
+    <div class="status-pill live"><span class="pulse"></span> AI Active</div>
+    <div class="topbar-time" id="clock"></div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main class="app">
+
+  <!-- DASHBOARD VIEW -->
+  <section class="view view--dashboard active" id="view-dashboard">
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <span class="kpi-label">Calls Booked Today</span>
+        <span class="kpi-value" id="kpi-booked">36</span>
+        <span class="kpi-delta up">+8 vs yesterday</span>
+      </div>
+      <div class="kpi-card kpi-accent">
+        <span class="kpi-label">Booking Rate</span>
+        <span class="kpi-value" id="kpi-rate">28.5%</span>
+        <span class="kpi-delta up">+3.2% this week</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">Active Campaigns</span>
+        <span class="kpi-value" id="kpi-campaigns">3</span>
+        <span class="kpi-delta neutral">1 paused</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">Leads Contacted</span>
+        <span class="kpi-value" id="kpi-contacted">1,946</span>
+        <span class="kpi-delta up">+124 today</span>
+      </div>
+      <div class="kpi-card kpi-warn">
+        <span class="kpi-label">No-Shows</span>
+        <span class="kpi-value" id="kpi-noshows">4</span>
+        <span class="kpi-delta down">2 pending re-book</span>
+      </div>
+      <div class="kpi-card kpi-success">
+        <span class="kpi-label">Conversion Rate</span>
+        <span class="kpi-value" id="kpi-conversion">14.2%</span>
+        <span class="kpi-delta up">+1.8% this month</span>
+      </div>
+    </div>
+
+    <div class="dash-body">
+      <!-- Left: Activity Chart + Rep Leaderboard -->
+      <div class="dash-left">
+        <div class="panel">
+          <div class="panel-header">
+            <h2>Today's Outreach Activity</h2>
+          </div>
+          <div class="chart-container" id="activity-chart"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><h2>Rep Leaderboard</h2></div>
+          <div class="rep-board" id="rep-board"></div>
+        </div>
+      </div>
+
+      <!-- Right: Upcoming Calls + Pipeline -->
+      <div class="dash-right">
+        <div class="panel">
+          <div class="panel-header"><h2>Upcoming Calls</h2></div>
+          <div class="upcoming-list" id="upcoming-calls"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-header"><h2>Lead Pipeline</h2></div>
+          <div class="pipeline" id="pipeline-bars"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CAMPAIGNS VIEW -->
+  <section class="view view--campaigns" id="view-campaigns">
+    <div class="section-header">
+      <h2>Campaign Overview</h2>
+      <div class="filter-pills">
+        <button class="pill active" data-cfilter="all">All</button>
+        <button class="pill" data-cfilter="active">Active</button>
+        <button class="pill" data-cfilter="paused">Paused</button>
+        <button class="pill" data-cfilter="completed">Completed</button>
+      </div>
+    </div>
+    <div class="campaigns-grid" id="campaigns-grid"></div>
+  </section>
+
+  <!-- LEADS VIEW -->
+  <section class="view view--leads" id="view-leads">
+    <div class="section-header">
+      <h2>Lead Management</h2>
+      <div class="filter-pills">
+        <button class="pill active" data-lfilter="all">All</button>
+        <button class="pill" data-lfilter="new">New</button>
+        <button class="pill" data-lfilter="contacted">Contacted</button>
+        <button class="pill" data-lfilter="engaged">Engaged</button>
+        <button class="pill" data-lfilter="meeting-set">Meeting Set</button>
+        <button class="pill" data-lfilter="booked">Booked</button>
+        <button class="pill" data-lfilter="converted">Converted</button>
+        <button class="pill" data-lfilter="no-show">No-Show</button>
+        <button class="pill" data-lfilter="lost">Lost</button>
+      </div>
+    </div>
+    <div class="leads-table-wrap">
+      <table class="leads-table" id="leads-table">
+        <thead>
+          <tr>
+            <th>Lead</th>
+            <th>Company</th>
+            <th>Status</th>
+            <th>Score</th>
+            <th>Campaign</th>
+            <th>Rep</th>
+            <th>Last Touch</th>
+            <th>Scheduled Call</th>
+          </tr>
+        </thead>
+        <tbody id="leads-tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- CONVERSATIONS VIEW -->
+  <section class="view view--conversations" id="view-conversations">
+    <div class="section-header">
+      <h2>AI Conversation Monitor</h2>
+      <div class="filter-pills">
+        <button class="pill active" data-sfilter="all">All</button>
+        <button class="pill" data-sfilter="positive">Positive</button>
+        <button class="pill" data-sfilter="warm">Warm</button>
+        <button class="pill" data-sfilter="neutral">Neutral</button>
+        <button class="pill" data-sfilter="cold">Cold</button>
+      </div>
+    </div>
+    <div class="conv-split">
+      <div class="conv-list" id="conv-list"></div>
+      <div class="conv-detail" id="conv-detail">
+        <div class="conv-detail-empty">Select a conversation to review the AI interaction.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCHEDULE VIEW -->
+  <section class="view view--schedule" id="view-schedule">
+    <div class="section-header">
+      <h2>Booked Calls Schedule</h2>
+      <div class="filter-pills">
+        <button class="pill active" data-bfilter="all">All</button>
+        <button class="pill" data-bfilter="today">Today</button>
+        <button class="pill" data-bfilter="upcoming">Upcoming</button>
+        <button class="pill" data-bfilter="no-show">No-Show</button>
+        <button class="pill" data-bfilter="completed">Completed</button>
+      </div>
+    </div>
+    <div class="schedule-list" id="schedule-list"></div>
+  </section>
+
+</main>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
